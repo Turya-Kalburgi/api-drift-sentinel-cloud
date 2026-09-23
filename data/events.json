@@ -1,0 +1,35 @@
+[
+  {
+    "id": "evt_1790125337863_8rnu0",
+    "repository": "acme-corp/auth-service",
+    "branch": "refs/heads/main",
+    "commitSha": "3c98d7e1a2f4",
+    "prNumber": null,
+    "breaking": false,
+    "breakingCount": 0,
+    "differences": [],
+    "receivedAt": "2026-09-23T01:02:17.863Z"
+  },
+  {
+    "id": "evt_1790125331157_2k9rr",
+    "repository": "acme-corp/payment-service",
+    "branch": "refs/pull/42/merge",
+    "commitSha": "f8a92b1c4e7d",
+    "prNumber": 42,
+    "breaking": true,
+    "breakingCount": 2,
+    "differences": [
+      {
+        "action": "remove",
+        "code": "response.body.property.missing",
+        "location": "/v1/charges -> 200 -> id"
+      },
+      {
+        "action": "change",
+        "code": "request.body.property.type.changed",
+        "location": "/v1/refunds -> amount"
+      }
+    ],
+    "receivedAt": "2026-09-23T01:02:11.157Z"
+  }
+]
