@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server';
 import { query, initDb } from '@/lib/db';
+import { enrichDifferencesWithRemediations } from '@/lib/remediation';
 
 async function sendSlackAlert(webhookUrl: string, event: any) {
   if (!webhookUrl || !event.breaking) return;
 
   const diffItems = (event.differences || [])
-    .map((d: any) => `• *${d.action.toUpperCase()}*: \`${d.code}\` at \`${d.location || 'spec'}\``)
-    .join('\n');
+    .map((d: any) => {
+      let block = `• *${d.action.toUpperCase()}*: \`${d.code}\`\n  *Location:* \`${d.location || 'spec'}\``;
+      if (d.remediation) {
+        block += `\n  💡 *Remediation:* ${d.remediation}`;
+      }
+      return block;
+    })
+    .join('\n\n');
 
   const text = `🚨 *API Drift Sentinel Alert*\n*Repo:* ${event.repository}\n*Ref:* ${event.branch} ${event.prNumber ? `(PR #${event.prNumber})` : ''}\n*Breaking Changes:* ${event.breakingCount}\n\n${diffItems}`;
 
@@ -65,12 +72,15 @@ export async function POST(req: Request) {
     const prNumber = body.prNumber || null;
     const breaking = Boolean(body.breaking);
     const breakingCount = body.breakingCount || (body.differences ? body.differences.length : 0);
-    const differences = JSON.stringify(body.differences || []);
+
+    // Automatically generate backward-compatibility fixes for every diff
+    const enrichedDifferences = enrichDifferencesWithRemediations(body.differences || []);
+    const differencesJson = JSON.stringify(enrichedDifferences);
 
     await query(
       `INSERT INTO sentinel_events (id, repository, branch, commit_sha, pr_number, breaking, breaking_count, differences)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)`,
-      [id, repository, branch, commitSha, prNumber, breaking, breakingCount, differences]
+      [id, repository, branch, commitSha, prNumber, breaking, breakingCount, differencesJson]
     );
 
     const slackWebhook = process.env.SLACK_WEBHOOK_URL;
@@ -81,11 +91,15 @@ export async function POST(req: Request) {
         prNumber,
         breaking,
         breakingCount,
-        differences: body.differences || [],
+        differences: enrichedDifferences,
       });
     }
 
-    return NextResponse.json({ success: true, eventId: id }, { status: 201 });
+    return NextResponse.json({ 
+      success: true, 
+      eventId: id,
+      remediationsGenerated: enrichedDifferences.length
+    }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Internal error' }, { status: 500 });
   }

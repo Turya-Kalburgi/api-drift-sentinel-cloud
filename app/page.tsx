@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from 'react';
 
+interface Difference {
+  action: string;
+  code: string;
+  location?: string;
+  remediation?: string;
+}
+
 interface SentinelEvent {
   id: string;
   repository: string;
@@ -10,7 +17,7 @@ interface SentinelEvent {
   prNumber: number | null;
   breaking: boolean;
   breakingCount: number;
-  differences: Array<{ action: string; code: string; location?: string }>;
+  differences: Difference[];
   receivedAt: string;
 }
 
@@ -25,8 +32,8 @@ export default function Dashboard() {
       if (data.events) {
         setEvents(data.events);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error('Failed to load events:', err);
     } finally {
       setLoading(false);
     }
@@ -34,110 +41,93 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchEvents();
-    const interval = setInterval(fetchEvents, 3000);
+    const interval = setInterval(fetchEvents, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  const totalRuns = events.length;
-  const breakingAlerts = events.filter((e) => e.breaking).length;
-  const passingRuns = totalRuns - breakingAlerts;
-
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 mb-8 gap-4">
+    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 font-sans">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <div className="h-4 w-4 rounded-full bg-red-500 animate-pulse" />
+              <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
               <h1 className="text-2xl font-bold tracking-tight">API Drift Sentinel Cloud</h1>
+              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full border border-slate-700">Governance & Remediation</span>
             </div>
-            <p className="text-sm text-slate-400 mt-1">Cross-repo OpenAPI contract governance & drift telemetry</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Automated contract drift monitoring with backward-compatible remediation guidance.
+            </p>
           </div>
-          <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-xs font-mono text-slate-400">
-            <span>Key:</span>
-            <span className="text-emerald-400 font-semibold">sentinel_live_secret123</span>
-          </div>
+          <button 
+            onClick={fetchEvents}
+            className="text-xs bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 px-3 py-1.5 rounded-md transition"
+          >
+            Refresh Stream
+          </button>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <div className="text-xs uppercase font-medium text-slate-400">Total Checks</div>
-            <div className="text-3xl font-bold mt-2 text-white">{totalRuns}</div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <div className="text-xs uppercase font-medium text-emerald-400">Contracts Passing</div>
-            <div className="text-3xl font-bold mt-2 text-emerald-400">{passingRuns}</div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <div className="text-xs uppercase font-medium text-red-400">Breaking Changes Blocked</div>
-            <div className="text-3xl font-bold mt-2 text-red-400">{breakingAlerts}</div>
-          </div>
-        </div>
-
-        <section className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center">
-            <h2 className="font-semibold text-sm tracking-wide">Live Contract Event Stream</h2>
-            <span className="text-xs text-slate-500 font-mono">Polls every 3s</span>
-          </div>
-
+        {/* Audit Stream */}
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold tracking-wide text-slate-200">Incident & Drift Stream</h2>
+          
           {loading ? (
-            <div className="p-8 text-center text-sm text-slate-500">Loading telemetry...</div>
+            <div className="text-sm text-slate-500">Connecting to persistent audit store...</div>
           ) : events.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">
-              <p className="text-base font-medium text-slate-300 mb-1">No telemetry events yet</p>
-              <p className="text-xs">Post an event or trigger the GitHub Action with your token to see live data.</p>
+            <div className="p-8 border border-dashed border-slate-800 rounded-lg text-center text-slate-500">
+              No API drift events recorded yet. Connect a repository CI action to begin monitoring.
             </div>
           ) : (
-            <div className="divide-y divide-slate-800">
+            <div className="grid gap-4">
               {events.map((evt) => (
-                <div key={evt.id} className="p-6 hover:bg-slate-850/50 transition">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                <div 
+                  key={evt.id} 
+                  className={`p-5 rounded-lg border transition ${
+                    evt.breaking 
+                      ? 'bg-rose-950/20 border-rose-900/60' 
+                      : 'bg-slate-900/40 border-slate-800'
+                  }`}
+                >
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 mb-3">
                     <div className="flex items-center gap-3">
-                      <span
-                        className={`text-xs px-2.5 py-1 rounded-full font-semibold font-mono ${
-                          evt.breaking
-                            ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        }`}
-                      >
-                        {evt.breaking ? 'BREAKING DRIFT' : 'CONTRACT VALID'}
+                      <span className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                        evt.breaking ? 'bg-rose-600/20 text-rose-400 border border-rose-600/40' : 'bg-emerald-600/20 text-emerald-400 border border-emerald-600/40'
+                      }`}>
+                        {evt.breaking ? `🚨 ${evt.breakingCount} BREAKING DRIFT` : '✅ PASSING'}
                       </span>
-                      <span className="font-semibold text-sm">{evt.repository}</span>
-                      {evt.prNumber && (
-                        <span className="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">
-                          PR #{evt.prNumber}
-                        </span>
-                      )}
+                      <span className="font-semibold text-sm text-slate-200">{evt.repository}</span>
+                      <span className="text-xs text-slate-400 font-mono">({evt.branch})</span>
                     </div>
-                    <span className="text-xs text-slate-500 font-mono">
-                      {new Date(evt.receivedAt).toLocaleTimeString()}
-                    </span>
+                    <div className="text-xs text-slate-400 font-mono">
+                      {new Date(evt.receivedAt).toLocaleTimeString()} · PR #{evt.prNumber || 'N/A'}
+                    </div>
                   </div>
 
-                  <div className="text-xs text-slate-400 font-mono mb-2">
-                    Ref: {evt.branch} | SHA: {evt.commitSha.substring(0, 7)}
-                  </div>
-
-                  {evt.breaking && evt.differences.length > 0 && (
-                    <div className="mt-3 bg-slate-950/80 rounded-lg p-3 border border-red-950/40">
-                      <table className="w-full text-xs font-mono">
-                        <thead>
-                          <tr className="text-slate-500 border-b border-slate-800 text-left">
-                            <th className="pb-1">Action</th>
-                            <th className="pb-1">Code</th>
-                            <th className="pb-1">Location</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-900">
-                          {evt.differences.map((diff, i) => (
-                            <tr key={i} className="text-slate-300">
-                              <td className="py-1 text-red-400 font-bold uppercase">{diff.action}</td>
-                              <td className="py-1">{diff.code}</td>
-                              <td className="py-1 text-slate-400">{diff.location || 'root'}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                  {evt.differences && evt.differences.length > 0 && (
+                    <div className="space-y-3 mt-4 pt-3 border-t border-slate-800/80">
+                      {evt.differences.map((d, idx) => (
+                        <div key={idx} className="bg-slate-950/80 border border-slate-800/80 rounded p-3 text-xs space-y-1.5 font-mono">
+                          <div className="flex items-center gap-2 text-rose-300">
+                            <span className="uppercase font-bold text-[10px] bg-rose-950 px-1.5 py-0.5 rounded border border-rose-800">
+                              {d.action}
+                            </span>
+                            <span>{d.code}</span>
+                          </div>
+                          {d.location && (
+                            <div className="text-slate-400">
+                              <span className="text-slate-500 font-sans">Target: </span>{d.location}
+                            </div>
+                          )}
+                          {d.remediation && (
+                            <div className="text-amber-200/90 font-sans bg-amber-950/30 border border-amber-900/40 p-2 rounded mt-2">
+                              <span className="font-semibold text-amber-400">💡 Suggested Migration: </span>
+                              {d.remediation}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
