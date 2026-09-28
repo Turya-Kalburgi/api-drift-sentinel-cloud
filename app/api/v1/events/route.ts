@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@vercel/postgres';
-import { initDb } from '@/lib/db';
+import { query, initDb } from '@/lib/db';
 
 async function sendSlackAlert(webhookUrl: string, event: any) {
   if (!webhookUrl || !event.breaking) return;
@@ -25,7 +24,7 @@ async function sendSlackAlert(webhookUrl: string, event: any) {
 export async function GET() {
   try {
     await initDb();
-    const { rows } = await sql`
+    const { rows } = await query(`
       SELECT 
         id, 
         repository, 
@@ -39,7 +38,7 @@ export async function GET() {
       FROM sentinel_events
       ORDER BY created_at DESC
       LIMIT 100;
-    `;
+    `);
     return NextResponse.json({ success: true, count: rows.length, events: rows });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -68,10 +67,11 @@ export async function POST(req: Request) {
     const breakingCount = body.breakingCount || (body.differences ? body.differences.length : 0);
     const differences = JSON.stringify(body.differences || []);
 
-    await sql`
-      INSERT INTO sentinel_events (id, repository, branch, commit_sha, pr_number, breaking, breaking_count, differences)
-      VALUES (${id}, ${repository}, ${branch}, ${commitSha}, ${prNumber}, ${breaking}, ${breakingCount}, ${differences}::jsonb);
-    `;
+    await query(
+      `INSERT INTO sentinel_events (id, repository, branch, commit_sha, pr_number, breaking, breaking_count, differences)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)`,
+      [id, repository, branch, commitSha, prNumber, breaking, breakingCount, differences]
+    );
 
     const slackWebhook = process.env.SLACK_WEBHOOK_URL;
     if (slackWebhook && breaking) {

@@ -1,7 +1,24 @@
-import { sql } from '@vercel/postgres';
+import { Pool } from 'pg';
+
+const connectionString = 
+  process.env.POSTGRES_URL || 
+  process.env.POSTGRES_PRISMA_URL || 
+  process.env.POSTGRES_URL_NON_POOLING || 
+  process.env.DATABASE_URL;
+
+const pool = new Pool({
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+export async function query(text: string, params?: any[]) {
+  return pool.query(text, params);
+}
 
 export async function initDb() {
-  await sql`
+  await query(`
     CREATE TABLE IF NOT EXISTS sentinel_events (
       id VARCHAR(64) PRIMARY KEY,
       repository VARCHAR(255) NOT NULL,
@@ -13,5 +30,5 @@ export async function initDb() {
       differences JSONB NOT NULL DEFAULT '[]'::jsonb,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
-  `;
+  `);
 }
