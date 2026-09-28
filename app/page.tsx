@@ -99,49 +99,36 @@ jobs:
   }, [events, searchTerm, filterBreakingOnly]);
 
   return (
-    <main className="min-h-screen bg-[#141517] text-[#c9c5be] font-sans antialiased relative overflow-hidden">
-      {/* Architectural subtle ambient background */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-25"
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 50% 0%, rgba(164, 147, 128, 0.18) 0%, transparent 65%),
-            linear-gradient(to right, rgba(92, 87, 81, 0.08) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(92, 87, 81, 0.08) 1px, transparent 1px)
-          `,
-          backgroundSize: '100% 100%, 36px 36px, 36px 36px'
-        }}
-      />
-
-      <div className="relative max-w-6xl mx-auto px-6 py-10 space-y-8 z-10">
+    <main className="min-h-screen bg-[#2C2929] text-[#DCD7D4] font-sans antialiased relative">
+      <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
         
         {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[#3c3a37]/80 pb-6 gap-4">
-          <div className="space-y-1.5">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[#DCD7D4]/20 pb-6 gap-4">
+          <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#a49380] animate-pulse"></span>
-              <h1 className="text-xl font-bold tracking-tight text-[#f2efe9] flex items-center gap-2.5">
+              <span className="h-3 w-3 rounded-full bg-[#70000E] border border-[#F5F4F2]/40 animate-pulse"></span>
+              <h1 className="text-2xl font-black tracking-tight text-[#F5F4F2] flex items-center gap-3">
                 API Drift Sentinel
-                <span className="text-[11px] font-mono font-medium bg-[#242323] text-[#a49380] border border-[#5c5751]/60 px-2 py-0.5 rounded">
+                <span className="text-xs font-mono font-bold bg-[#030303] text-[#C3B79D] border border-[#C3B79D]/40 px-2.5 py-0.5 rounded">
                   v1.2 Cloud
                 </span>
               </h1>
             </div>
-            <p className="text-xs text-[#8f8a82]">
-              Architectural API governance, schema drift blocking, and backward-compatible remediation.
+            <p className="text-xs font-medium text-[#DCD7D4]/70">
+              Enterprise OpenAPI contract protection, schema drift blocking, and backward-compatible remediation.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setShowModal(true)}
-              className="text-xs font-semibold bg-[#a49380] hover:bg-[#b8a996] text-[#141517] px-4 py-2 rounded shadow transition active:scale-95"
+              className="text-xs font-bold uppercase tracking-wider bg-[#C3B79D] hover:bg-[#d8cbb1] text-[#030303] px-4 py-2.5 rounded shadow transition active:scale-95"
             >
               + Connect Repository
             </button>
             <button
               onClick={fetchEvents}
-              className="text-xs bg-[#242323] hover:bg-[#302e2e] border border-[#5c5751]/60 text-[#c9c5be] px-3.5 py-2 rounded transition"
+              className="text-xs font-semibold bg-[#030303] hover:bg-[#1a1818] border border-[#DCD7D4]/30 text-[#F5F4F2] px-4 py-2.5 rounded transition"
             >
               Refresh
             </button>
@@ -150,21 +137,21 @@ jobs:
 
         {/* Executive KPI Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-[#1f2022]/90 border border-[#3c3a37] rounded-lg p-4 space-y-1 backdrop-blur-sm">
-            <span className="text-[11px] uppercase tracking-wider text-[#8f8a82] font-semibold">Total Audits</span>
-            <div className="text-2xl font-bold font-mono text-[#f2efe9]">{stats.total}</div>
+          <div className="bg-[#030303]/90 border border-[#DCD7D4]/25 rounded-lg p-5 space-y-1 shadow-md">
+            <span className="text-[11px] uppercase tracking-wider text-[#DCD7D4]/60 font-bold">Total Audits</span>
+            <div className="text-3xl font-extrabold font-mono text-[#F5F4F2]">{stats.total}</div>
           </div>
-          <div className="bg-[#2c1d1d]/80 border border-[#5a2c2c] rounded-lg p-4 space-y-1 backdrop-blur-sm">
-            <span className="text-[11px] uppercase tracking-wider text-[#d99898] font-semibold">Breaking Drifts</span>
-            <div className="text-2xl font-bold font-mono text-[#f0a8a8]">{stats.breaking}</div>
+          <div className="bg-[#70000E] border border-[#70000E] rounded-lg p-5 space-y-1 shadow-lg shadow-[#70000E]/20">
+            <span className="text-[11px] uppercase tracking-wider text-[#F5F4F2]/80 font-bold">Breaking Drifts</span>
+            <div className="text-3xl font-extrabold font-mono text-[#F5F4F2]">{stats.breaking}</div>
           </div>
-          <div className="bg-[#1f2022]/90 border border-[#3c3a37] rounded-lg p-4 space-y-1 backdrop-blur-sm">
-            <span className="text-[11px] uppercase tracking-wider text-[#8f8a82] font-semibold">Remediations</span>
-            <div className="text-2xl font-bold font-mono text-[#a49380]">{stats.totalRemediations}</div>
+          <div className="bg-[#030303]/90 border border-[#DCD7D4]/25 rounded-lg p-5 space-y-1 shadow-md">
+            <span className="text-[11px] uppercase tracking-wider text-[#C3B79D] font-bold">Remediations</span>
+            <div className="text-3xl font-extrabold font-mono text-[#C3B79D]">{stats.totalRemediations}</div>
           </div>
-          <div className="bg-[#1f2022]/90 border border-[#3c3a37] rounded-lg p-4 space-y-1 backdrop-blur-sm">
-            <span className="text-[11px] uppercase tracking-wider text-[#8f8a82] font-semibold">Monitored Repos</span>
-            <div className="text-2xl font-bold font-mono text-[#f2efe9]">{stats.uniqueRepos}</div>
+          <div className="bg-[#030303]/90 border border-[#DCD7D4]/25 rounded-lg p-5 space-y-1 shadow-md">
+            <span className="text-[11px] uppercase tracking-wider text-[#DCD7D4]/60 font-bold">Monitored Repos</span>
+            <div className="text-3xl font-extrabold font-mono text-[#F5F4F2]">{stats.uniqueRepos}</div>
           </div>
         </div>
 
@@ -173,19 +160,19 @@ jobs:
           <div className="relative flex-1 max-w-sm">
             <input
               type="text"
-              placeholder="Filter by repository or branch..."
+              placeholder="Search repository or branch..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#1b1c1e] border border-[#3c3a37] text-xs text-[#f2efe9] placeholder-[#736e67] rounded px-3.5 py-2.5 focus:outline-none focus:border-[#a49380] transition"
+              className="w-full bg-[#030303] border border-[#DCD7D4]/30 text-xs text-[#F5F4F2] placeholder-[#DCD7D4]/40 rounded px-3.5 py-2.5 focus:outline-none focus:border-[#C3B79D] transition"
             />
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setFilterBreakingOnly(!filterBreakingOnly)}
-              className={`text-xs px-3.5 py-2.5 rounded border transition ${
+              className={`text-xs font-semibold px-4 py-2.5 rounded border transition ${
                 filterBreakingOnly
-                  ? 'bg-[#3b2222] border-[#8a4242] text-[#f0a8a8]'
-                  : 'bg-[#1b1c1e] border-[#3c3a37] text-[#8f8a82] hover:text-[#f2efe9]'
+                  ? 'bg-[#70000E] border-[#70000E] text-[#F5F4F2]'
+                  : 'bg-[#030303] border-[#DCD7D4]/30 text-[#DCD7D4] hover:text-[#F5F4F2]'
               }`}
             >
               {filterBreakingOnly ? 'Showing Breaking Only' : 'Show All Events'}
@@ -196,11 +183,11 @@ jobs:
         {/* Incident Stream */}
         <section className="space-y-4">
           {loading ? (
-            <div className="text-center py-16 text-xs text-[#8f8a82] font-mono">
+            <div className="text-center py-16 text-xs text-[#DCD7D4]/60 font-mono">
               Loading persistent governance audit store...
             </div>
           ) : filteredEvents.length === 0 ? (
-            <div className="p-12 border border-dashed border-[#3c3a37] rounded-lg text-center text-xs text-[#8f8a82]">
+            <div className="p-12 border-2 border-dashed border-[#DCD7D4]/20 rounded-lg text-center text-xs text-[#DCD7D4]/60">
               No matching drift incidents found.
             </div>
           ) : (
@@ -208,31 +195,31 @@ jobs:
               {filteredEvents.map((evt) => (
                 <div
                   key={evt.id}
-                  className={`p-5 rounded-lg border backdrop-blur transition ${
+                  className={`p-6 rounded-lg border transition ${
                     evt.breaking
-                      ? 'bg-[#1f1a1a]/90 border-[#5a2c2c]/80 hover:border-[#7a3b3b]'
-                      : 'bg-[#1b1c1e]/90 border-[#3c3a37]/80 hover:border-[#5c5751]'
+                      ? 'bg-[#030303] border-l-4 border-l-[#70000E] border-[#DCD7D4]/20 shadow-md'
+                      : 'bg-[#030303] border-l-4 border-l-[#C3B79D] border-[#DCD7D4]/20'
                   }`}
                 >
-                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 pb-3 border-b border-[#3c3a37]/70">
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 pb-3 border-b border-[#DCD7D4]/15">
                     <div className="flex flex-wrap items-center gap-2.5">
                       <span
-                        className={`px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded ${
+                        className={`px-2.5 py-1 text-[11px] font-black tracking-wider uppercase rounded ${
                           evt.breaking
-                            ? 'bg-[#3b2222] text-[#f0a8a8] border border-[#5a2c2c]'
-                            : 'bg-[#242323] text-[#a49380] border border-[#5c5751]/60'
+                            ? 'bg-[#70000E] text-[#F5F4F2]'
+                            : 'bg-[#C3B79D] text-[#030303]'
                         }`}
                       >
                         {evt.breaking ? `🚨 ${evt.breakingCount} BREAKING DRIFT` : '✅ PASSING'}
                       </span>
-                      <span className="font-semibold text-sm text-[#f2efe9]">{evt.repository}</span>
-                      <span className="text-xs font-mono text-[#8f8a82] bg-[#141517] px-2 py-0.5 rounded border border-[#3c3a37]">
+                      <span className="font-bold text-base text-[#F5F4F2]">{evt.repository}</span>
+                      <span className="text-xs font-mono text-[#DCD7D4]/80 bg-[#2C2929] px-2 py-0.5 rounded border border-[#DCD7D4]/20">
                         {evt.branch}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3 text-xs text-[#8f8a82] font-mono">
-                      <span>PR #{evt.prNumber || 'N/A'}</span>
+                    <div className="flex items-center gap-3 text-xs text-[#DCD7D4]/70 font-mono">
+                      <span className="font-semibold text-[#F5F4F2]">PR #{evt.prNumber || 'N/A'}</span>
                       <span>·</span>
                       <span>{new Date(evt.receivedAt).toLocaleTimeString()}</span>
                     </div>
@@ -243,24 +230,26 @@ jobs:
                       {evt.differences.map((d, idx) => (
                         <div
                           key={idx}
-                          className="bg-[#141517]/95 border border-[#3c3a37] rounded p-3 text-xs space-y-2 font-mono"
+                          className="bg-[#2C2929] border border-[#DCD7D4]/25 rounded-md p-4 text-xs space-y-2 font-mono"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="uppercase text-[10px] font-bold tracking-wider bg-[#3b2222] text-[#f0a8a8] px-1.5 py-0.5 rounded border border-[#5a2c2c]">
+                          <div className="flex items-center gap-2.5">
+                            <span className="uppercase text-[10px] font-black tracking-widest bg-[#70000E] text-[#F5F4F2] px-2 py-0.5 rounded">
                               {d.action}
                             </span>
-                            <span className="text-[#f2efe9]">{d.code}</span>
+                            <span className="text-[#F5F4F2] font-semibold">{d.code}</span>
                           </div>
 
                           {d.location && (
-                            <div className="text-[#8f8a82] text-[11px]">
-                              <span className="font-sans text-[#736e67]">Target: </span>{d.location}
+                            <div className="text-[#DCD7D4]/80 text-[11px]">
+                              <span className="font-sans font-bold text-[#DCD7D4]">Target: </span>{d.location}
                             </div>
                           )}
 
                           {d.remediation && (
-                            <div className="text-[#d8d3cb] font-sans bg-[#262422] border border-[#5c5751]/50 p-2.5 rounded mt-2 text-[11px] leading-relaxed">
-                              <span className="font-semibold text-[#a49380]">💡 Suggested Migration: </span>
+                            <div className="text-[#030303] font-sans bg-[#C3B79D] p-3 rounded mt-2.5 text-xs leading-relaxed font-medium shadow-sm">
+                              <span className="font-black uppercase tracking-wider block mb-1">
+                                💡 Suggested Migration
+                              </span>
                               {d.remediation}
                             </div>
                           )}
@@ -277,27 +266,27 @@ jobs:
 
       {/* Connect Repository Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-[#0e0e0f]/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-[#1b1c1e] border border-[#3c3a37] rounded-lg max-w-xl w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center border-b border-[#3c3a37] pb-3">
-              <h3 className="text-xs font-bold text-[#f2efe9] uppercase tracking-wider">Connect a Repository</h3>
+        <div className="fixed inset-0 bg-[#030303]/85 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-[#2C2929] border border-[#DCD7D4]/30 rounded-lg max-w-xl w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-[#DCD7D4]/20 pb-3">
+              <h3 className="text-xs font-black text-[#F5F4F2] uppercase tracking-wider">Connect a Repository</h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-[#8f8a82] hover:text-[#f2efe9] text-sm"
+                className="text-[#DCD7D4] hover:text-[#F5F4F2] text-sm"
               >
                 ✕
               </button>
             </div>
-            <p className="text-xs text-[#8f8a82] leading-relaxed">
-              Add this workflow to your repository at <code className="text-[#a49380] font-mono">.github/workflows/sentinel.yml</code>. It will guard your PRs and stream audit metrics directly to this dashboard.
+            <p className="text-xs text-[#DCD7D4]/80 leading-relaxed">
+              Add this workflow to your repository at <code className="text-[#C3B79D] font-mono">.github/workflows/sentinel.yml</code>. It will guard your PRs and stream audit metrics directly to this dashboard.
             </p>
             <div className="relative">
-              <pre className="bg-[#141517] border border-[#3c3a37] rounded p-3.5 text-xs font-mono text-[#c9c5be] overflow-x-auto leading-relaxed">
+              <pre className="bg-[#030303] border border-[#DCD7D4]/25 rounded p-3.5 text-xs font-mono text-[#F5F4F2] overflow-x-auto leading-relaxed">
                 {workflowSnippet}
               </pre>
               <button
                 onClick={copyToClipboard}
-                className="absolute top-2.5 right-2.5 bg-[#242323] hover:bg-[#302e2e] text-[#f2efe9] border border-[#5c5751]/60 text-xs px-2.5 py-1 rounded transition"
+                className="absolute top-2.5 right-2.5 bg-[#2C2929] hover:bg-[#3d3838] text-[#F5F4F2] border border-[#DCD7D4]/30 text-xs px-2.5 py-1 rounded transition"
               >
                 {copied ? '✓ Copied' : 'Copy'}
               </button>
@@ -305,7 +294,7 @@ jobs:
             <div className="flex justify-end pt-2">
               <button
                 onClick={() => setShowModal(false)}
-                className="text-xs bg-[#a49380] hover:bg-[#b8a996] text-[#141517] px-4 py-2 rounded font-medium transition"
+                className="text-xs font-bold uppercase tracking-wider bg-[#C3B79D] hover:bg-[#d8cbb1] text-[#030303] px-4 py-2 rounded transition"
               >
                 Done
               </button>
