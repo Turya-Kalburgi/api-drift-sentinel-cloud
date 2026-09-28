@@ -24,6 +24,36 @@ interface SentinelEvent {
 export default function Dashboard() {
   const [events, setEvents] = useState<SentinelEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const workflowSnippet = `name: API Drift Sentinel
+on:
+  pull_request:
+    paths:
+      - 'openapi.yaml'
+      - 'openapi.json'
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run API Drift Sentinel
+        uses: Turya-Kalburgi/api-drift-sentinel@v1.2.0
+        with:
+          base-spec: 'openapi.yaml'
+          head-spec: 'openapi.yaml'
+          fail-on-breaking: 'true'
+          github-token: \${{ secrets.GITHUB_TOKEN }}
+          sentinel-endpoint: 'https://api-drift-sentinel-cloud.vercel.app/api/v1/events'
+          sentinel-token: 'sentinel_live_secret123'`;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(workflowSnippet);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const fetchEvents = async () => {
     try {
@@ -46,7 +76,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 font-sans">
+    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 font-sans relative">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
@@ -61,17 +91,28 @@ export default function Dashboard() {
               Automated contract drift monitoring with backward-compatible remediation guidance.
             </p>
           </div>
-          <button 
-            onClick={fetchEvents}
-            className="text-xs bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 px-3 py-1.5 rounded-md transition"
-          >
-            Refresh Stream
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setShowModal(true)}
+              className="text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-md shadow-sm transition"
+            >
+              + Connect Repository
+            </button>
+            <button 
+              onClick={fetchEvents}
+              className="text-xs bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 px-3 py-2 rounded-md transition"
+            >
+              Refresh Stream
+            </button>
+          </div>
         </header>
 
         {/* Audit Stream */}
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold tracking-wide text-slate-200">Incident & Drift Stream</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold tracking-wide text-slate-200">Incident & Drift Stream</h2>
+            <span className="text-xs text-slate-500 font-mono">{events.length} total events recorded</span>
+          </div>
           
           {loading ? (
             <div className="text-sm text-slate-500">Connecting to persistent audit store...</div>
@@ -121,7 +162,7 @@ export default function Dashboard() {
                             </div>
                           )}
                           {d.remediation && (
-                            <div className="text-amber-200/90 font-sans bg-amber-950/30 border border-amber-900/40 p-2 rounded mt-2">
+                            <div className="text-amber-200/90 font-sans bg-amber-950/30 border border-amber-900/40 p-2.5 rounded mt-2">
                               <span className="font-semibold text-amber-400">💡 Suggested Migration: </span>
                               {d.remediation}
                             </div>
@@ -136,6 +177,45 @@ export default function Dashboard() {
           )}
         </section>
       </div>
+
+      {/* Connect Repository Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+              <h3 className="text-lg font-bold text-slate-100">Connect a Repository</h3>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="text-slate-400 hover:text-slate-200 text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-slate-400">
+              Add this workflow to your repository at <code className="text-emerald-400 font-mono">.github/workflows/sentinel.yml</code>. It will guard your PRs and stream audit metrics directly to this dashboard.
+            </p>
+            <div className="relative">
+              <pre className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 text-xs font-mono text-slate-300 overflow-x-auto">
+                {workflowSnippet}
+              </pre>
+              <button
+                onClick={copyToClipboard}
+                className="absolute top-2.5 right-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-1 rounded transition"
+              >
+                {copied ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-medium transition"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
