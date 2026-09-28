@@ -1,10 +1,15 @@
 import { Pool } from 'pg';
 
-const connectionString = 
+let connectionString = 
   process.env.POSTGRES_URL || 
   process.env.POSTGRES_PRISMA_URL || 
   process.env.POSTGRES_URL_NON_POOLING || 
-  process.env.DATABASE_URL;
+  process.env.DATABASE_URL || '';
+
+// Strip any sslmode query params that conflict with custom ssl config
+if (connectionString.includes('?')) {
+  connectionString = connectionString.split('?')[0];
+}
 
 const pool = new Pool({
   connectionString,
